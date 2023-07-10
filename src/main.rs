@@ -1,42 +1,49 @@
+#![allow(unused)]
+use bracket_lib::prelude::*;
+use specs::prelude::*;
+use std::cmp::{max, min};
+use specs_derive::Component;
+
+
+
+#[derive(Component)]
+struct Pos{
+    x:i32,
+    y: i32
+}
+
+#[derive(Component)]
+struct Renderable {
+    glyph: FontCharType,
+    fg: RGB,
+    bg: RGB
+}
+
+struct State {
+    ecs: World
+}
+
+
+impl GameState for State {
+    fn tick(&mut self, ctx: &mut BTerm) {
+        let posis = self.ecs.read_storage::<Pos>();
+        let renders = self.ecs.read_storage::<Renderable>();
+
+        for (pos, render) in (&posis, &renders).join() {
+            ctx.set(pos.x, pos.y, render.fg,render.bg, render.glyph)
+        }
+    }
+}
 
 
 fn main() -> bracket_lib::prelude::BError {
 
-    #![allow(unused)]
-    use bracket_lib::prelude::*;
-    use specs::prelude::*;
-    use std::cmp::{max, min};
-    use specs_derive::Component;
 
-    #[derive(Component)]
-    struct Pos{
-        x:i32,
-        y: i32
-    }
-    #[derive(Component)]
-    struct Renderable {
-        glyph: FontCharType,
-        fg: RGB,
-        bg: RGB
-    }
-
-    struct State {
-        ecs: World
-    }
-    impl GameState for State {
-        fn tick(&mut self, ctx: &mut BTerm) {
-            let posis = self.ecs.read_storage::<Pos>();
-            let renders = self.ecs.read_storage::<Renderable>();
-
-            for (pos, render) in (&posis, &renders).join() {
-                ctx.set(pos.x, pos.y, render.fg,render.bg, render.glyph)
-            }
-        }
-}
     let mut gs = State {
         ecs: World::new()
 
     };
+
     gs.ecs.register::<Pos>();
     gs.ecs.register::<Renderable>();
 
