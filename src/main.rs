@@ -21,6 +21,9 @@ impl<'a> System<'a> for LeftWalker {
 }
 
 #[derive(Component)]
+struct Player {}
+
+#[derive(Component)]
 struct Pos{
     x:i32,
     y: i32
@@ -47,6 +50,8 @@ struct State {
 impl GameState for State {
     fn tick(&mut self, ctx: &mut BTerm) {
 
+        player_input(self, ctx);
+
         ctx.cls();
 
         self.run_systems();
@@ -60,6 +65,29 @@ impl GameState for State {
     }
 }
 
+fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
+    let mut positions = ecs.write_storage::<Pos>();
+    let mut players = ecs.write_storage::<Player>();
+
+    for (_player, pos) in (&mut players, &mut positions).join() {
+        pos.x = min(79, max(0, pos.x + delta_x));
+        pos.y = min(79, max(0, pos.y + delta_y));
+    }
+}
+
+fn player_input(gs: &mut State, ctx: &mut BTerm) {
+    // Player movement
+    match ctx.key {
+        None => {}
+        Some(key) => match key {
+            VirtualKeyCode::Left => try_move_player(-1, 0, &mut gs.ecs),
+            VirtualKeyCode::Right => try_move_player(1, 0, &mut gs.ecs),
+            VirtualKeyCode::Up => try_move_player(0, -1, &mut gs.ecs),
+            VirtualKeyCode::Down => try_move_player(0, 1, &mut gs.ecs),
+            _ => {}
+        }
+    }
+}
 
 fn main() -> bracket_lib::prelude::BError {
 
@@ -72,6 +100,7 @@ fn main() -> bracket_lib::prelude::BError {
     gs.ecs.register::<Pos>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<LeftMover>();
+    gs.ecs.register::<Player>();
 
     gs.ecs
         .create_entity()
@@ -81,6 +110,7 @@ fn main() -> bracket_lib::prelude::BError {
             fg: RGB::named(YELLOW),
             bg: RGB::named(BLACK)
         })
+        .with(Player{})
         .build();
 
     for i in 0..10 {
