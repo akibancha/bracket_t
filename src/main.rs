@@ -51,7 +51,8 @@ fn main() -> bracket_lib::prelude::BError {
 
     };
 
-    gs.ecs.insert(new_map());
+    gs.ecs.insert(new_map_test());
+    gs.ecs.insert(new_map_rooms_and_corridors());
     gs.ecs.register::<Pos>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
