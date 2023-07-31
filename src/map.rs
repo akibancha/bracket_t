@@ -44,7 +44,7 @@ pub fn xy_idx(x: i32, y:i32) -> usize {
 }
 
 // Creates a map with rectangulat rooms and corridors that connect them.
-pub fn new_map_rooms_and_corridors() -> Vec<TileType> {
+pub fn new_map_rooms_and_corridors() -> (Vec<Rect>, Vec<TileType>) {
     let mut map = vec![TileType::Wall; 80*50];
 
     let mut rooms: Vec<Rect> = Vec::new();
@@ -91,7 +91,7 @@ pub fn new_map_rooms_and_corridors() -> Vec<TileType> {
         }
     }
 
-    map
+    (rooms, map)
 }
 
 // Creates a map with soild boundaries and 400 randomly placed walls.

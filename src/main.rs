@@ -52,15 +52,18 @@ fn main() -> bracket_lib::prelude::BError {
 
     };
 
+    let (rooms, map): (Vec<Rect>, Vec<TileType>) = new_map_rooms_and_corridors();
     gs.ecs.insert(new_map_test());
-    gs.ecs.insert(new_map_rooms_and_corridors());
+    gs.ecs.insert(map);
+
     gs.ecs.register::<Pos>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
 
+    let (player_x, player_y): (i32, i32) = rooms[0].center();
     gs.ecs
         .create_entity()
-        .with(Pos{x:40, y:25})
+        .with(Pos{x:player_x, y:player_y})
         .with(Renderable {
             glyph: to_cp437('@'),
             fg: RGB::named(YELLOW),
