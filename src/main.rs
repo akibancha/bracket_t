@@ -11,6 +11,7 @@ pub use map::*;
 mod player;
 pub use player::*;
 mod rect;
+pub use rect::Rect;
 
 
 pub struct State {

@@ -1,5 +1,6 @@
 use::bracket_lib::prelude::{RGB, BTerm, RandomNumberGenerator, to_cp437};
 use std::cmp::{min, max};
+use super::Rect;
 
 
 #[derive(PartialEq, Copy, Clone)]
@@ -8,12 +9,73 @@ pub enum TileType {
     Floor
 }
 
+// Applies a room to the map.
+fn apply_room_to_map(room: &Rect, map: &mut [TileType]) {
+    for y in room.y1 + 1 ..= room.y2 {
+        for x in room.x1 + 1 ..= room.x2 {
+            map[xy_idx(x, y)] = TileType::Floor;
+        }
+    } 
+}
+
+// Applies a horizontal corridor to the map.
+fn apply_horizontal_tunnel(map: &mut [TileType], x1: i32, x2: i32, y: i32){
+    for x in min(x1, x2) ..= max(x1, x2) {
+        let idx = xy_idx(x, y);
+        if idx > 0 && idx < 80*50 {
+            map[idx as usize] = TileType::Floor;
+        }
+    }
+}
+
+// Applies a vertical corridor to the map.
+fn apply_vertical_tunnel(map: &mut [TileType], y1: i32, y2: i32, x: i32){
+    for y in min(y1, y2) ..= max(y1, y2) {
+        let idx = xy_idx(x, y);
+        if idx > 0 && idx < 80*50 {
+            map[idx as usize] = TileType::Floor;
+        }
+    }
+}
+
+// Translates x and y in to an index in the one-dimensional map vector.
 pub fn xy_idx(x: i32, y:i32) -> usize {
     (y as usize * 80) + x as usize
 }
 
+// Creates a map with rectangulat rooms and corridors that connect them.
 pub fn new_map_rooms_and_corridors() -> Vec<TileType> {
     let mut map = vec![TileType::Wall; 80*50];
+
+    let mut rooms: Vec<Rect> = Vec::new();
+    const MAX_ROOMS: i32 = 30;
+    const MIN_SIZE: i32 = 6;
+    const MAX_SIZE: i32 = 10;
+
+    let mut rng = RandomNumberGenerator::new();
+
+    for _ in 0..MAX_ROOMS {
+
+        let w: i32 = rng.range(MIN_SIZE, MAX_SIZE);
+        let h: i32 = rng.range(MIN_SIZE, MAX_SIZE);
+
+        let x: i32 = rng.roll_dice(1, 80 - w -1) -1; 
+        let y: i32 = rng.roll_dice(1, 50 - h -1) -1; 
+
+        let new_room: Rect = Rect::new(x, y, w, h);
+        let mut ok: bool = true;
+
+        for other_room in rooms.iter() {
+            if new_room.intersect(other_room) {
+                ok = false
+            }
+        }
+
+        if ok {
+            apply_room_to_map(&new_room, &mut map);
+            rooms.push(new_room);
+        }
+    }
 
     map
 }
@@ -46,6 +108,7 @@ pub fn new_map_test() -> Vec<TileType> {
     map
 }
 
+// Draws the map to a BTerm.
 pub fn draw_map(map: &[TileType], ctx: &mut BTerm) {
     let mut y = 0;
     let mut x = 0;
@@ -68,4 +131,3 @@ pub fn draw_map(map: &[TileType], ctx: &mut BTerm) {
         }
     }
 }
-
