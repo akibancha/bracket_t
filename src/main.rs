@@ -32,10 +32,10 @@ impl GameState for State {
 
         self.run_systems();
 
-        let map = self.ecs.fetch::<Vec<TileType>>();
         let posis = self.ecs.read_storage::<Pos>();
         let renders = self.ecs.read_storage::<Renderable>();
 
+        let map = self.ecs.fetch::<Map>();
         draw_map(&map, ctx);
 
         for (pos, render) in (&posis, &renders).join() {
@@ -46,21 +46,18 @@ impl GameState for State {
 
 fn main() -> bracket_lib::prelude::BError {
 
-
     let mut gs = State {
         ecs: World::new()
-
     };
 
-    let (rooms, map): (Vec<Rect>, Vec<TileType>) = new_map_rooms_and_corridors();
-    gs.ecs.insert(new_map_test());
+    let map: Map = Map::new_map_rooms_and_corridors();
+    let (player_x, player_y): (i32, i32) = map.rooms[0].center();
     gs.ecs.insert(map);
 
     gs.ecs.register::<Pos>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
 
-    let (player_x, player_y): (i32, i32) = rooms[0].center();
     gs.ecs
         .create_entity()
         .with(Pos{x:player_x, y:player_y})
