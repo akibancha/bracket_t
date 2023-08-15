@@ -40,7 +40,7 @@ impl GameState for State {
         let renders = self.ecs.read_storage::<Renderable>();
 
         let map = self.ecs.fetch::<Map>();
-        draw_map(&map, ctx);
+        draw_map(&self.ecs, ctx);
 
         for (pos, render) in (&posis, &renders).join() {
             ctx.set(pos.x, pos.y, render.fg,render.bg, render.glyph)

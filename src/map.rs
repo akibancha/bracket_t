@@ -1,7 +1,7 @@
 use::bracket_lib::prelude::{RGB, BTerm, RandomNumberGenerator, to_cp437, Algorithm2D, BaseMap, Point};
 use std::cmp::{min, max};
-use super::Rect;
-
+use super::{Rect, Viewshed, Player};
+use specs::prelude::*;
 
 #[derive(PartialEq, Copy, Clone)]
 pub enum TileType {
@@ -151,25 +151,31 @@ impl BaseMap for Map {
 //
 
 // Draws the map to a BTerm.
-pub fn draw_map(map: &Map, ctx: &mut BTerm) {
-    let mut y = 0;
-    let mut x = 0;
-    for tile in map.tiles.iter() {
-        match tile {
+pub fn draw_map(ecs: &World, ctx: &mut BTerm) {
+    let mut viewsheds = ecs.write_storage::<Viewshed>();
+    let mut players = ecs.write_storage::<Player>();
+    let map = ecs.fetch::<Map>();
 
-            TileType::Floor => {
-                ctx.set(x, y, RGB::from_f32(0.5, 0.5, 0.5), RGB::from_f32(0., 0., 0.), to_cp437('.'))
+    for (_player, viewshed) in (&mut players, &mut viewsheds).join() {
+        let mut y = 0;
+        let mut x = 0;
+        for tile in map.tiles.iter() {
+            let pt = Point::new(x, y);
+            if viewshed.visable_tiles.contains(&pt) {
+                match tile {
+                    TileType::Floor => {
+                        ctx.set(x, y, RGB::from_f32(0.5, 0.5, 0.5), RGB::from_f32(0., 0., 0.), to_cp437('.'))
+                    }
+                    TileType::Wall => {
+                        ctx.set(x, y, RGB::from_f32(0.0, 1.0, 0.0), RGB::from_f32(0., 0., 0.), to_cp437('#'))
+                    }
+                }
             }
- 
-            TileType::Wall => {
-                ctx.set(x, y, RGB::from_f32(0.0, 1.0, 0.0), RGB::from_f32(0., 0., 0.), to_cp437('#'))
+            x += 1;
+            if x > 79 {
+                x = 0;
+                y += 1;
             }
-        }
-
-        x += 1;
-        if x > 79 {
-            x = 0;
-            y += 1;
         }
     }
 }
