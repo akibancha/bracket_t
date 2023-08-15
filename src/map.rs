@@ -1,4 +1,4 @@
-use::bracket_lib::prelude::{RGB, BTerm, RandomNumberGenerator, to_cp437};
+use::bracket_lib::prelude::{RGB, BTerm, RandomNumberGenerator, to_cp437, Algorithm2D, BaseMap, Point};
 use std::cmp::{min, max};
 use super::Rect;
 
@@ -15,6 +15,7 @@ pub struct Map {
     pub width : i32,
     pub height : i32
 }
+
 
 impl Map {
  
@@ -107,6 +108,19 @@ impl Map {
 
 } // impl end
 
+impl Algorithm2D for Map {
+    fn dimensions(&self) -> Point {
+        Point::new(self.width, self.height)
+    }
+}
+
+impl BaseMap for Map {
+    fn is_opaque(&self, idx: usize) -> bool {
+    self.tiles[idx as usize] == TileType::Wall
+    } 
+}
+
+
 // Creates a map with soild boundaries and 400 randomly placed walls.
 //pub fn new_map_test() -> Vec<TileType> {
 //    let mut map = vec![TileType::Floor; 80*50];
@@ -159,3 +173,5 @@ pub fn draw_map(map: &Map, ctx: &mut BTerm) {
         }
     }
 }
+
+
