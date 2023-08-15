@@ -12,6 +12,8 @@ mod player;
 pub use player::*;
 mod rect;
 pub use rect::Rect;
+mod visibility_system;
+pub use visibility_system::VisibilitySystem;
 
 
 pub struct State {
@@ -19,6 +21,8 @@ pub struct State {
 }
  impl State {
     fn run_systems(&mut self) {
+        let mut vis = VisibilitySystem{};
+        vis.run_now(&self.ecs);
         self.ecs.maintain();
     }
  }
@@ -32,7 +36,7 @@ impl GameState for State {
 
         self.run_systems();
 
-        let posis = self.ecs.read_storage::<Pos>();
+        let posis = self.ecs.read_storage::<Position>();
         let renders = self.ecs.read_storage::<Renderable>();
 
         let map = self.ecs.fetch::<Map>();
@@ -54,19 +58,21 @@ fn main() -> bracket_lib::prelude::BError {
     let (player_x, player_y): (i32, i32) = map.rooms[0].center();
     gs.ecs.insert(map);
 
-    gs.ecs.register::<Pos>();
+    gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
+    gs.ecs.register::<Viewshed>();
 
     gs.ecs
         .create_entity()
-        .with(Pos{x:player_x, y:player_y})
+        .with(Position{x:player_x, y:player_y})
         .with(Renderable {
             glyph: to_cp437('@'),
             fg: RGB::named(YELLOW),
             bg: RGB::named(BLACK)
         })
         .with(Player{})
+        .with(Viewshed{visable_tiles: Vec::new(), range: 8})
         .build();
 
     let context = BTermBuilder::simple80x50()

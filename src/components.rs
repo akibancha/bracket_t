@@ -1,4 +1,4 @@
-use bracket_lib::prelude::{FontCharType, RGB};
+use bracket_lib::{prelude::{FontCharType, RGB}, terminal::Point};
 use specs::prelude::*;
 use specs_derive::*;
 
@@ -6,7 +6,7 @@ use specs_derive::*;
 pub struct Player {}
 
 #[derive(Component)]
-pub struct Pos{
+pub struct Position{
     pub x:i32,
     pub y: i32
 }
@@ -16,5 +16,11 @@ pub struct Renderable {
     pub glyph: FontCharType,
     pub fg: RGB,
     pub bg: RGB
+}
+
+#[derive(Component)]
+pub struct Viewshed {
+    pub visable_tiles : Vec<Point>,
+    pub range : i32
 }
 

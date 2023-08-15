@@ -1,10 +1,10 @@
 use bracket_lib::prelude::{VirtualKeyCode, BTerm};
 use specs::prelude::*;
-use super::{Pos, Player, TileType, Map, State};
+use super::{Position, Player, TileType, Map, State};
 use std::cmp::{min, max};
 
 pub fn try_move_player(delta_x: i32, delta_y: i32, ecs: &mut World) {
-    let mut positions = ecs.write_storage::<Pos>();
+    let mut positions = ecs.write_storage::<Position>();
     let mut players = ecs.write_storage::<Player>();
     let map = ecs.fetch::<Map>();
 
