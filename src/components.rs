@@ -20,7 +20,8 @@ pub struct Renderable {
 
 #[derive(Component)]
 pub struct Viewshed {
-    pub visable_tiles : Vec<Point>,
-    pub range : i32
+    pub visible_tiles : Vec<Point>,
+    pub range : i32,
+    pub dirty: bool
 }
 

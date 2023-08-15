@@ -72,7 +72,7 @@ fn main() -> bracket_lib::prelude::BError {
             bg: RGB::named(BLACK)
         })
         .with(Player{})
-        .with(Viewshed{visable_tiles: Vec::new(), range: 8})
+        .with(Viewshed{visible_tiles: Vec::new(), range: 8, dirty: true})
         .build();
 
     let context = BTermBuilder::simple80x50()
