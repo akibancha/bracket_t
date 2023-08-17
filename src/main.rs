@@ -53,14 +53,26 @@ fn main() -> bracket_lib::prelude::BError {
         ecs: World::new()
     };
 
-    let map: Map = Map::new_map_rooms_and_corridors();
-    let (player_x, player_y): (i32, i32) = map.rooms[0].center();
-    gs.ecs.insert(map);
-
     gs.ecs.register::<Position>();
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
     gs.ecs.register::<Viewshed>();
+    let map: Map = Map::new_map_rooms_and_corridors();
+
+    let (player_x, player_y): (i32, i32) = map.rooms[0].center();
+
+    for room in map.rooms.iter().skip(1) {
+        let (x, y) = room.center();
+        gs.ecs.create_entity()
+            .with(Position{x, y})
+            .with(Renderable{
+                glyph: to_cp437('r'),
+                fg: RGB::named(RED),
+                bg: RGB::named(BLACK),
+            })
+            .with(Viewshed{visible_tiles: Vec::new(), range: 8, dirty: true})
+            .build();
+    }
 
     gs.ecs
         .create_entity()
@@ -77,6 +89,8 @@ fn main() -> bracket_lib::prelude::BError {
     let context = BTermBuilder::simple80x50()
         .with_title("Huhu World!")
         .build()?;
+
+    gs.ecs.insert(map);
 
     main_loop(context, gs)
 }
