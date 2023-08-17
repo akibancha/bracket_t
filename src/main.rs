@@ -14,6 +14,8 @@ mod rect;
 pub use rect::Rect;
 mod visibility_system;
 pub use visibility_system::VisibilitySystem;
+mod monster_ai_system;
+pub use monster_ai_system::MonsterAI;
 
 pub struct State {
    pub  ecs: World
@@ -22,6 +24,8 @@ pub struct State {
     fn run_systems(&mut self) {
         let mut vis = VisibilitySystem{};
         vis.run_now(&self.ecs);
+        let mut mob = MonsterAI{};
+        mob.run_now(&self.ecs);
         self.ecs.maintain();
     }
  }
@@ -60,6 +64,7 @@ fn main() -> bracket_lib::prelude::BError {
     gs.ecs.register::<Renderable>();
     gs.ecs.register::<Player>();
     gs.ecs.register::<Viewshed>();
+    gs.ecs.register::<Monster>();
     let map: Map = Map::new_map_rooms_and_corridors();
 
     let (player_x, player_y): (i32, i32) = map.rooms[0].center();
@@ -81,6 +86,7 @@ fn main() -> bracket_lib::prelude::BError {
                 bg: RGB::named(BLACK),
             })
             .with(Viewshed{visible_tiles: Vec::new(), range: 8, dirty: true})
+            .with(Monster{})
             .build();
     }
 
