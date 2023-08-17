@@ -64,12 +64,19 @@ fn main() -> bracket_lib::prelude::BError {
 
     let (player_x, player_y): (i32, i32) = map.rooms[0].center();
 
+    let mut rng = RandomNumberGenerator::new();
     for room in map.rooms.iter().skip(1) {
         let (x, y) = room.center();
+        let roll = rng.roll_dice(1, 2);
+        let glyph: char;
+        match roll {
+            1 => {glyph = 'r'}
+            _ => {glyph = '7'}
+        }
         gs.ecs.create_entity()
             .with(Position{x, y})
             .with(Renderable{
-                glyph: to_cp437('r'),
+                glyph: to_cp437(glyph),
                 fg: RGB::named(RED),
                 bg: RGB::named(BLACK),
             })
