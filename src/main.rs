@@ -15,7 +15,6 @@ pub use rect::Rect;
 mod visibility_system;
 pub use visibility_system::VisibilitySystem;
 
-
 pub struct State {
    pub  ecs: World
 }

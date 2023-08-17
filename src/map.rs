@@ -168,7 +168,7 @@ pub fn draw_map(ecs: &World, ctx: &mut BTerm) {
                 match tile {
                     TileType::Floor => {
                         glyph = to_cp437('.');
-                        fg = RGB::from_f32(0.5, 0.5, 0.5); 
+                        fg = RGB::from_f32(0.6, 0.3, 0.5); 
                     }
                     TileType::Wall => {
                         glyph = to_cp437('#');
